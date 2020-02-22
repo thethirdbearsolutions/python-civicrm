@@ -139,19 +139,20 @@ class CiviCRM:
         self.api_key = api_key
         self.use_ssl = use_ssl
         self.timeout = timeout
-        if self.use_ssl:
-            start = 'https://'
-        else:
-            start = 'http://'
-        self.url = "%s%s/extern/rest.php" % (start, self.urlstring)
-
+        #if self.use_ssl:
+        #    start = 'https://'
+        #else:
+        #    start = 'http://'
+        #self.url = "%s%s/extern/rest.php" % (start, self.urlstring)
+        self.url = url
+        
     def _get(self, action, entity, parameters=None):
         """Internal method to make api calls using GET."""
 
         if not parameters:
             parameters = {}
         payload = self._construct_payload('get', action, entity, parameters)
-        api_call = requests.get(self.url, params=payload, timeout=self.timeout)
+        api_call = requests.get(self.url, params=payload, timeout=self.timeout, verify=self.use_ssl)
         if api_call.status_code != 200:
             raise CivicrmError('request to %s failed with status code %s'
                                % (self.url, api_call.status_code))
@@ -165,7 +166,7 @@ class CiviCRM:
             parameters = {}
         postdata = self._construct_payload('post', action, entity, parameters)
         api_call = requests.post(
-            self.url, data=postdata, timeout=self.timeout
+            self.url, data=postdata, timeout=self.timeout, verify=self.use_ssl
         )
         if api_call.status_code != 200:
             raise CivicrmError('request to %s failed with status code %s'
